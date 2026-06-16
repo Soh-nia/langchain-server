@@ -38,7 +38,14 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json({ limit: "10mb" })); // large limit for document text
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGIN || "http://localhost:3000",
+    origin: (origin, callback) => {
+      if (!origin || origin === process.env.ALLOWED_ORIGIN) {
+        callback(null, true);
+      } else {
+        console.log(`Blocked CORS from: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "DELETE"],
     allowedHeaders: ["Content-Type"],
   }),
